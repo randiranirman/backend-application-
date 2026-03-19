@@ -1,33 +1,40 @@
-name: Gradle Build #
+name: Gradle Build
 
 on:
   push:
     branches:
-      - main # Trigger on push events to the main branch
+      - main
   pull_request:
     branches:
-      - main # Trigger on pull request events targeting the main branch
+      - main
 
 jobs:
   build:
-    runs-on: ubuntu-latest # Run on a fresh virtual machine
+    runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4 # Check out the repository code
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
-      - name: Set up JDK 17 # Use the setup-java action to configure the JDK
+      - name: Set up JDK
         uses: actions/setup-java@v4
         with:
-          java-version: '17'
-          distribution: 'corretto' # e.g., Amazon Corretto
-          cache: 'gradle' # Cache Gradle dependencies to speed up builds
+          java-version: '17' # Specify your JDK version
+          distribution: 'temurin'
+          cache: 'gradle'
 
-      - name: Validate Gradle wrapper # Recommended action for security
+      - name: Validate Gradle wrapper
         uses: gradle/actions/wrapper-validation@v4
 
-      - name: Setup Gradle # Use the setup-gradle action
+      - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
 
-      - name: Build with Gradle # Execute the build and test tasks using the Gradle wrapper
-        run: chmod +x ./gradlew 
-             ./gradlew build
+      - name: Run build with tests
+        run: ./gradlew build --scan
+
+      - name: Upload test results (optional)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results
+          path: build/test-results/test
