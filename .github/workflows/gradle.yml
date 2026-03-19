@@ -31,5 +31,10 @@ jobs:
 
       - name: Run build with tests
         run: ./gradlew build --scan
+        env:
+           SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/devopsdb
+           SPRING_DATASOURCE_USERNAME: postgres
+           SPRING_DATASOURCE_PASSWORD: postgres
+
 
 
