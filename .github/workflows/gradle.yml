@@ -1,0 +1,54 @@
+name: Gradle Build
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    services:
+      postgres: # Spins up a real PG container
+        image: postgres:16
+        env:
+          POSTGRES_DB: devopsdb
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17' # Specify your JDK version
+          distribution: 'temurin'
+          cache: 'gradle'
+
+      - name: Validate Gradle wrapper
+        uses: gradle/actions/wrapper-validation@v4
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Run build with tests
+        run: ./gradlew build --scan
+        env:
+           SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/devopsdb
+           SPRING_DATASOURCE_USERNAME: postgres
+           SPRING_DATASOURCE_PASSWORD: postgres
+
+
+
