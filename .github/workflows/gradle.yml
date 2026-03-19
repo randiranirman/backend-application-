@@ -29,4 +29,4 @@ jobs:
         uses: gradle/actions/setup-gradle@v4
 
       - name: Build with Gradle # Execute the build and test tasks using the Gradle wrapper
-        run: ./gradlew build
+        run: chmod +x ./gradlew ./gradlew build
